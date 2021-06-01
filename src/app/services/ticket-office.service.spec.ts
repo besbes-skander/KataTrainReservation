@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { TicketOfficeService } from './ticket-office.service';
+import {TicketOfficeService} from './ticket-office.service';
 
 describe('TicketOfficeService', () => {
   let service: TicketOfficeService;
@@ -33,6 +33,15 @@ describe('TicketOfficeService', () => {
     const nbrSeats = 0;
 
     expect(() => service.makeReservation(trainId, nbrSeats)).toThrow(new Error('Invalid parameters'));
+  });
+
+  it('should return a Reservation object', () => {
+    const trainId = 'azec4542';
+    const nbrSeats = 2;
+
+    const result = service.makeReservation(trainId, nbrSeats);
+
+    expect(Object.keys(result)).toEqual(['train_id', 'booking_reference', 'seats']);
   });
 
 
