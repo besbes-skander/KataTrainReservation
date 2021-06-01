@@ -28,5 +28,12 @@ describe('TicketOfficeService', () => {
     expect(() => service.makeReservation(trainId, nbrSeats)).toThrow(new Error('Invalid parameters'));
   });
 
+  it('should throw error when nbrSeats is 0', () => {
+    const trainId = 'azec4542';
+    const nbrSeats = 0;
+
+    expect(() => service.makeReservation(trainId, nbrSeats)).toThrow(new Error('Invalid parameters'));
+  });
+
 
 });

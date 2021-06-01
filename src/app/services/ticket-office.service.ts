@@ -9,7 +9,7 @@ export class TicketOfficeService {
   }
 
   makeReservation(trainId: string, nbrSeats: number) {
-    if(!trainId) {
+    if(!trainId || !nbrSeats) {
       throw new Error('Invalid parameters');
     }
 
