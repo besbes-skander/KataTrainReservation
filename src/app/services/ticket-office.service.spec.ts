@@ -13,8 +13,11 @@ describe('TicketOfficeService', () => {
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
+  
+  it('should accept a train_id and a number of seats', () => {
+    const trainId = '1z5e4a';
+    const nbrSeats = 3;
 
-  it('should throw error when no argument passed', () => {
-    expect(() => service.makeReservation()).toThrow(new Error('Invalid parameters'));
+    expect(service.makeReservation(trainId, nbrSeats)).toBeTruthy();
   });
 });

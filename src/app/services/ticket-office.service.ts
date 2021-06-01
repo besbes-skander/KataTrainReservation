@@ -1,13 +1,14 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketOfficeService {
 
-  constructor() { }
+  constructor() {
+  }
 
-  makeReservation() {
-    throw new Error('Invalid parameters');
+  makeReservation(trainId: string, nbrSeats: number) {
+    return true;
   }
 }
