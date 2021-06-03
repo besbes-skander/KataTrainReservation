@@ -1,17 +1,24 @@
 import {Injectable} from '@angular/core';
 import {Reservation} from "../interfaces/reservation";
+import {TrainDataService} from "./train-data.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketOfficeService {
 
-  constructor() {
+  constructor(public trainDataService: TrainDataService) {
   }
 
-  makeReservation(trainId: string, nbrSeats: number): Reservation {
-    if(!trainId || !nbrSeats) {
+  async makeReservation(trainId: string, nbrSeats: number): Promise<Reservation> {
+    if (!trainId || !nbrSeats) {
       throw new Error('Invalid parameters');
+    }
+
+    const trainData = await this.trainDataService.getTrainData(trainId);
+
+    if (!trainData || trainData.length === 0) {
+      throw new Error('Unknown train id');
     }
 
     return {

@@ -1,13 +1,27 @@
-import {TestBed} from '@angular/core/testing';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 
 import {TicketOfficeService} from './ticket-office.service';
+import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
+import {TrainDataService} from "./train-data.service";
 
 describe('TicketOfficeService', () => {
   let service: TicketOfficeService;
+  let trainDataService: TrainDataService;
+  let valueServiceSpy: jasmine.SpyObj<TrainDataService>;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+
+    const spyTrainData = jasmine.createSpyObj<any>('TrainDataService', ['getTrainData']);
+
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [{provide: TrainDataService, useValue: spyTrainData}]
+    });
+
+    httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(TicketOfficeService);
+    valueServiceSpy = TestBed.inject(TrainDataService) as jasmine.SpyObj<TrainDataService>;
   });
 
   it('should be created', () => {
@@ -17,6 +31,17 @@ describe('TicketOfficeService', () => {
   it('should accept a train_id and a number of seats', () => {
     const trainId = '1z5e4a';
     const nbrSeats = 3;
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    service.makeReservation(trainId, nbrSeats);
 
     expect(service.makeReservation(trainId, nbrSeats)).toBeTruthy();
   });
@@ -25,24 +50,73 @@ describe('TicketOfficeService', () => {
     const trainId = '';
     const nbrSeats = 3;
 
-    expect(() => service.makeReservation(trainId, nbrSeats)).toThrow(new Error('Invalid parameters'));
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    service.makeReservation(trainId, nbrSeats).catch(error => {
+      expect(error).toEqual(new Error('Invalid parameters'));
+    });
   });
 
   it('should throw error when nbrSeats is 0', () => {
     const trainId = 'azec4542';
     const nbrSeats = 0;
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+        }
+    };
 
-    expect(() => service.makeReservation(trainId, nbrSeats)).toThrow(new Error('Invalid parameters'));
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    service.makeReservation(trainId, nbrSeats).catch(error => {
+      expect(error).toEqual(new Error('Invalid parameters'));
+    });
   });
 
-  it('should return a Reservation object', () => {
+  it('should return a Reservation object', async () => {
     const trainId = 'azec4542';
     const nbrSeats = 2;
 
-    const result = service.makeReservation(trainId, nbrSeats);
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    const result = await service.makeReservation(trainId, nbrSeats);
 
     expect(Object.keys(result)).toEqual(['train_id', 'booking_reference', 'seats']);
   });
 
+  it('should call getTrainData once', () => {
+    const trainId = 'unknown';
+    const nbrSeats = 2;
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    service.makeReservation(trainId, nbrSeats).catch(error => error);
+    expect(valueServiceSpy.getTrainData.calls.count()).toBe(1, 'spy method was called once');
+  });
+  
 
 });
