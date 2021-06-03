@@ -117,6 +117,18 @@ describe('TicketOfficeService', () => {
     service.makeReservation(trainId, nbrSeats).catch(error => error);
     expect(valueServiceSpy.getTrainData.calls.count()).toBe(1, 'spy method was called once');
   });
-  
+
+  it('should throw error when trainId is unknown', () => {
+    const trainId = 'unknown';
+    const nbrSeats = 2;
+
+    const mockTrainData: Object = [];
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    service.makeReservation(trainId, nbrSeats).catch(error => {
+      expect(error).toEqual(new Error('Unknown train id'));
+    })
+  });
 
 });
