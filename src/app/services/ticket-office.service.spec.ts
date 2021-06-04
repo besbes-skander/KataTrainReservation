@@ -106,14 +106,6 @@ describe('TicketOfficeService', () => {
     const trainId = 'unknown';
     const nbrSeats = 2;
 
-    const mockTrainData = {
-      "seats":
-        {
-          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
-          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
-        }
-    };
-
     service.makeReservation(trainId, nbrSeats).catch(error => error);
     expect(valueServiceSpy.getTrainData.calls.count()).toBe(1, 'spy method was called once');
   });
@@ -129,6 +121,21 @@ describe('TicketOfficeService', () => {
     service.makeReservation(trainId, nbrSeats).catch(error => {
       expect(error).toEqual(new Error('Unknown train id'));
     })
+  });
+
+  it('should return true if train has more than 70% reservations', () => {
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "aze", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "azea", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    const result = service.trainHasMoreThan70PercentReservations(mockTrainData);
+
+    expect(result).toBeTruthy();
   });
 
 });

@@ -21,10 +21,18 @@ export class TicketOfficeService {
       throw new Error('Unknown train id');
     }
 
+
     return {
       train_id: '',
       booking_reference: '',
       seats: []
     };
+  }
+
+  trainHasMoreThan70PercentReservations(trainData: any): boolean {
+    const reservedSeats = Object.values(trainData.seats).filter((seat: any) => seat.booking_reference !== '').length;
+    const numberOfSeats = Object.values(trainData.seats).length;
+
+    return (reservedSeats / numberOfSeats) > 0.7 ;
   }
 }
