@@ -153,4 +153,22 @@ describe('TicketOfficeService', () => {
     expect(result).toBeFalse();
   });
 
+  it('should return return coach B', () => {
+
+    const nbrSeats = 3;
+    const trainSeats = {
+      "1A": {"booking_reference": "aze", "seat_number": "1", "coach": "A"},
+      "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"},
+      "2B": {"booking_reference": "", "seat_number": "2", "coach": "A"},
+      "3A": {"booking_reference": "", "seat_number": "2", "coach": "B"},
+      "4A": {"booking_reference": "", "seat_number": "2", "coach": "B"},
+      "5A": {"booking_reference": "", "seat_number": "2", "coach": "B"},
+      "6A": {"booking_reference": "", "seat_number": "2", "coach": "B"}
+    };
+
+    const result = service.getAvailableCoach(trainSeats, nbrSeats);
+
+    expect(result).toEqual('B');
+  });
+
 });

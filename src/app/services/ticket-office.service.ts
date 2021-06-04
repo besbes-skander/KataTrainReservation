@@ -33,6 +33,32 @@ export class TicketOfficeService {
     const reservedSeats = Object.values(trainData.seats).filter((seat: any) => seat.booking_reference !== '').length;
     const numberOfSeats = Object.values(trainData.seats).length;
 
-    return (reservedSeats / numberOfSeats) > 0.7 ;
+    return (reservedSeats / numberOfSeats) > 0.7;
   }
+
+  getAvailableCoach(trainSeats: any, nbrSeats: number): string {
+    let seatsByCoach = this.groupBy(Object.values(trainSeats), 'coach');
+
+    const availableCoachs = Object.keys(seatsByCoach).filter((coach: any) => {
+      const reservedSeats = seatsByCoach[coach].filter((seat: any) => seat.booking_reference !== '').length;
+      const totalSeats = seatsByCoach[coach].length;
+      return (reservedSeats / totalSeats) < 0.7 && (reservedSeats + nbrSeats) <= totalSeats
+    });
+
+    return availableCoachs[0];
+  }
+
+  groupBy(items: any, key: string) {
+    return items.reduce(
+      (result: any, item: any) => ({
+        ...result,
+        [item[key]]: [
+          ...(result[item[key]] || []),
+          item,
+        ],
+      }),
+      {},
+    );
+  }
+
 }
