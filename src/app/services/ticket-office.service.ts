@@ -1,13 +1,15 @@
 import {Injectable} from '@angular/core';
 import {Reservation} from "../interfaces/reservation";
 import {TrainDataService} from "./train-data.service";
+import {BookingReferenceService} from "./booking-reference.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketOfficeService {
 
-  constructor(public trainDataService: TrainDataService) {
+  constructor(public trainDataService: TrainDataService,
+              public bookingReferenceService: BookingReferenceService) {
   }
 
   async makeReservation(trainId: string, nbrSeats: number): Promise<Reservation> {
@@ -31,8 +33,12 @@ export class TicketOfficeService {
 
     const availableCoach = this.getAvailableCoach(trainData.seats, nbrSeats);
 
-    if(availableCoach) {
+    if (availableCoach) {
       const reservedSeats = this.getReservedSeats(trainData.seats, availableCoach, nbrSeats);
+
+      if (reservedSeats.length) {
+        const bookingReference = await this.bookingReferenceService.getBookingReference();
+      }
 
       return {
         train_id: trainId,

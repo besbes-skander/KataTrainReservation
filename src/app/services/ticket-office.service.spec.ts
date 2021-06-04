@@ -3,25 +3,32 @@ import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TicketOfficeService} from './ticket-office.service';
 import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
 import {TrainDataService} from "./train-data.service";
+import {BookingReferenceService} from "./booking-reference.service";
 
 describe('TicketOfficeService', () => {
   let service: TicketOfficeService;
   let trainDataService: TrainDataService;
   let valueServiceSpy: jasmine.SpyObj<TrainDataService>;
+  let bookingServiceSpy: jasmine.SpyObj<BookingReferenceService>;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
 
     const spyTrainData = jasmine.createSpyObj<any>('TrainDataService', ['getTrainData']);
+    const spyBookingReferenceService = jasmine.createSpyObj<any>('BookingReferenceService', ['getBookingReference']);
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{provide: TrainDataService, useValue: spyTrainData}]
+      providers: [
+        {provide: TrainDataService, useValue: spyTrainData},
+        {provide: BookingReferenceService, useValue: spyBookingReferenceService}
+      ]
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(TicketOfficeService);
     valueServiceSpy = TestBed.inject(TrainDataService) as jasmine.SpyObj<TrainDataService>;
+    bookingServiceSpy = TestBed.inject(BookingReferenceService) as jasmine.SpyObj<BookingReferenceService>;
   });
 
   it('should be created', () => {
@@ -236,6 +243,31 @@ describe('TicketOfficeService', () => {
     const result = await service.makeReservation(trainId, nbrSeats);
 
     expect(result.seats).toEqual(['1B', '2B']);
+  });
+
+  it('should call getBookingReference once', async () => {
+
+    const trainId = 'azec4542';
+    const nbrSeats = 2;
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "aze", "seat_number": "2", "coach": "A"},
+          "1B": {"booking_reference": "", "seat_number": "1", "coach": "B"},
+          "2B": {"booking_reference": "", "seat_number": "2", "coach": "B"},
+          "3B": {"booking_reference": "", "seat_number": "3", "coach": "B"},
+          "4B": {"booking_reference": "", "seat_number": "4", "coach": "B"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+    bookingServiceSpy.getBookingReference.and.returnValue(Promise.resolve('aze'));
+
+    const result = await service.makeReservation(trainId, nbrSeats);
+
+    expect(bookingServiceSpy.getBookingReference.calls.count()).toBe(1, 'spy method was called once');
   });
 
 });
