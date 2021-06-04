@@ -270,4 +270,29 @@ describe('TicketOfficeService', () => {
     expect(bookingServiceSpy.getBookingReference.calls.count()).toBe(1, 'spy method was called once');
   });
 
+  it('should return booking reference aze', async () => {
+
+    const trainId = 'azec4542';
+    const nbrSeats = 2;
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "aze", "seat_number": "2", "coach": "A"},
+          "1B": {"booking_reference": "", "seat_number": "1", "coach": "B"},
+          "2B": {"booking_reference": "", "seat_number": "2", "coach": "B"},
+          "3B": {"booking_reference": "", "seat_number": "3", "coach": "B"},
+          "4B": {"booking_reference": "", "seat_number": "4", "coach": "B"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+    bookingServiceSpy.getBookingReference.and.returnValue(Promise.resolve('aze'));
+
+    const result = await service.makeReservation(trainId, nbrSeats);
+
+    expect(result.booking_reference).toEqual('aze');
+  });
+
 });

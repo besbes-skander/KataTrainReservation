@@ -13,6 +13,7 @@ export class TicketOfficeService {
   }
 
   async makeReservation(trainId: string, nbrSeats: number): Promise<Reservation> {
+    let bookingReference = '';
     if (!trainId || !nbrSeats) {
       throw new Error('Invalid parameters');
     }
@@ -37,12 +38,12 @@ export class TicketOfficeService {
       const reservedSeats = this.getReservedSeats(trainData.seats, availableCoach, nbrSeats);
 
       if (reservedSeats.length) {
-        const bookingReference = await this.bookingReferenceService.getBookingReference();
+        bookingReference = await this.bookingReferenceService.getBookingReference();
       }
 
       return {
         train_id: trainId,
-        booking_reference: 'aze',
+        booking_reference: bookingReference,
         seats: reservedSeats
       };
     }
