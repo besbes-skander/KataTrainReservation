@@ -124,7 +124,7 @@ describe('TicketOfficeService', () => {
   });
 
   it('should return true if train has more than 70% reservations', () => {
-
+    const nbrSeats = 1;
     const mockTrainData = {
       "seats":
         {
@@ -133,22 +133,24 @@ describe('TicketOfficeService', () => {
         }
     };
 
-    const result = service.trainHasMoreThan70PercentReservations(mockTrainData);
+    const result = service.trainHasMoreThan70PercentReservations(mockTrainData, nbrSeats);
 
     expect(result).toBeTruthy();
   });
 
   it('should return false if train has less than 70% reservations', () => {
-
+    const nbrSeats = 1;
     const mockTrainData = {
       "seats":
         {
           "1A": {"booking_reference": "aze", "seat_number": "1", "coach": "A"},
-          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"},
+          "3A": {"booking_reference": "", "seat_number": "2", "coach": "A"},
+          "4A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
         }
     };
 
-    const result = service.trainHasMoreThan70PercentReservations(mockTrainData);
+    const result = service.trainHasMoreThan70PercentReservations(mockTrainData, nbrSeats);
 
     expect(result).toBeFalse();
   });
@@ -169,6 +171,47 @@ describe('TicketOfficeService', () => {
     const result = service.getAvailableCoach(trainSeats, nbrSeats);
 
     expect(result).toEqual('B');
+  });
+
+
+  it('should return empty reservation if train have more than 70% reservations', async () => {
+
+    const trainId = 'azec4542';
+    const nbrSeats = 2;
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "aze", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "aze", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    const result = await service.makeReservation(trainId, nbrSeats);
+
+    expect(result.booking_reference).toEqual('');
+  });
+
+  it('should return empty reservation if train have more than 70% reservations including asked seats', async () => {
+
+    const trainId = 'azec4542';
+    const nbrSeats = 2;
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    const result = await service.makeReservation(trainId, nbrSeats);
+
+    expect(result.booking_reference).toEqual('');
   });
 
 });

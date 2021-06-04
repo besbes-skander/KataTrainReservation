@@ -21,19 +21,26 @@ export class TicketOfficeService {
       throw new Error('Unknown train id');
     }
 
+    if(this.trainHasMoreThan70PercentReservations(trainData, nbrSeats)) {
+      return {
+        train_id: trainId,
+        booking_reference: '',
+        seats: []
+      };
+    }
 
     return {
-      train_id: '',
-      booking_reference: '',
+      train_id: trainId,
+      booking_reference: 'aze',
       seats: []
     };
   }
 
-  trainHasMoreThan70PercentReservations(trainData: any): boolean {
+  trainHasMoreThan70PercentReservations(trainData: any, nbrSeats: number): boolean {
     const reservedSeats = Object.values(trainData.seats).filter((seat: any) => seat.booking_reference !== '').length;
     const numberOfSeats = Object.values(trainData.seats).length;
 
-    return (reservedSeats / numberOfSeats) > 0.7;
+    return ((reservedSeats + nbrSeats) / numberOfSeats) > 0.7;
   }
 
   getAvailableCoach(trainSeats: any, nbrSeats: number): string {
