@@ -138,4 +138,19 @@ describe('TicketOfficeService', () => {
     expect(result).toBeTruthy();
   });
 
+  it('should return false if train has less than 70% reservations', () => {
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "aze", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "", "seat_number": "2", "coach": "A"}
+        }
+    };
+
+    const result = service.trainHasMoreThan70PercentReservations(mockTrainData);
+
+    expect(result).toBeFalse();
+  });
+
 });
