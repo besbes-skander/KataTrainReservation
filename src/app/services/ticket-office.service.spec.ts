@@ -222,7 +222,6 @@ describe('TicketOfficeService', () => {
   });
 
   it('should return seats 1B and 2B', async () => {
-
     const trainId = 'azec4542';
     const nbrSeats = 2;
 
