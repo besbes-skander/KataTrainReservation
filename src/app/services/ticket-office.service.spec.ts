@@ -214,4 +214,28 @@ describe('TicketOfficeService', () => {
     expect(result.booking_reference).toEqual('');
   });
 
+  it('should return seats 1B and 2B', async () => {
+
+    const trainId = 'azec4542';
+    const nbrSeats = 2;
+
+    const mockTrainData = {
+      "seats":
+        {
+          "1A": {"booking_reference": "", "seat_number": "1", "coach": "A"},
+          "2A": {"booking_reference": "aze", "seat_number": "2", "coach": "A"},
+          "1B": {"booking_reference": "", "seat_number": "1", "coach": "B"},
+          "2B": {"booking_reference": "", "seat_number": "2", "coach": "B"},
+          "3B": {"booking_reference": "", "seat_number": "3", "coach": "B"},
+          "4B": {"booking_reference": "", "seat_number": "4", "coach": "B"}
+        }
+    };
+
+    valueServiceSpy.getTrainData.and.returnValue(Promise.resolve(mockTrainData));
+
+    const result = await service.makeReservation(trainId, nbrSeats);
+
+    expect(result.seats).toEqual(['1B', '2B']);
+  });
+
 });

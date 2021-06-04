@@ -21,13 +21,26 @@ export class TicketOfficeService {
       throw new Error('Unknown train id');
     }
 
-    if(this.trainHasMoreThan70PercentReservations(trainData, nbrSeats)) {
+    if (this.trainHasMoreThan70PercentReservations(trainData, nbrSeats)) {
       return {
         train_id: trainId,
         booking_reference: '',
         seats: []
       };
     }
+
+    const availableCoach = this.getAvailableCoach(trainData.seats, nbrSeats);
+
+    if(availableCoach) {
+      const reservedSeats = this.getReservedSeats(trainData.seats, availableCoach, nbrSeats);
+
+      return {
+        train_id: trainId,
+        booking_reference: 'aze',
+        seats: reservedSeats
+      };
+    }
+
 
     return {
       train_id: trainId,
@@ -68,4 +81,14 @@ export class TicketOfficeService {
     );
   }
 
+  private getReservedSeats(seats: any, availableCoach: string, nbrSeats: number) {
+    let reservedSeats = [];
+    let seatsByCoach = this.groupBy(Object.values(seats), 'coach');
+
+    for (let i = 0; i < nbrSeats; i++) {
+      reservedSeats.push(seatsByCoach[availableCoach][i]['seat_number'] + availableCoach);
+    }
+
+    return reservedSeats;
+  }
 }
